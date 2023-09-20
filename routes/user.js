@@ -1,11 +1,21 @@
 const express = require("express");
-const session = require('express-session')
+// const session = require('express-session')
+const mysql = require('mysql');
 const { db } = require('../config');
 const { FieldValue } = require("firebase-admin/firestore");
 const userModel = require('../model/userModel.js');
 const jwt = require('jsonwebtoken');
 
 const router = express.Router();
+
+const db_mysql = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER_NAME,
+    password: process.env.DB_USER_PASSWORD,
+    database: process.env.DB
+});
+
+
 
 //FUNCTION
 const {
@@ -24,6 +34,20 @@ const saltRounds = 10;
 //TEST
 
 router.get('/test-user', async (req, res) => {
+
+    db_mysql.connect(function (err) {
+        if (err) throw err;
+        console.log("Connected to mysql!");
+        const insert_sql = `INSERT INTO user (name, lastname, email, password) 
+                    VALUES ('shany', 'fox', 'shany@gmail.com', 'azerty')`;
+        const select_sql = `SELECT * FROM user`            
+
+        db_mysql.query(select_sql, (err, result, fields) => {
+            if (err) throw err;
+            console.log(result[0].id);
+        })
+    });
+
     res.send("test")
 })
 
@@ -68,7 +92,7 @@ router.post('/add-user', async (req, res) => {
     //Hashage du mot de passe de l'utilisateur 
     user_model.hashPassword = await hash(req.body.password)
 
-    //Insertion des donner traiter dans la DB (users)
+    //Insertion des données traiter dans la DB (users)
     const data = await add_user_to_db(user_model.model())
     res.status(200).send(data)
 });
@@ -104,7 +128,7 @@ router.post('/compare-user', async (req, res) => {
     if (user.length == 0) {
         const message = {
             statu: "error",
-            auth:false,
+            auth: false,
             message: "Utilisateur introuvable"
         }
         res.send(message);
@@ -117,10 +141,10 @@ router.post('/compare-user', async (req, res) => {
         res.json({
             auth: false,
             message: "Mot de passe invalide"
-            });
-            return;
+        });
+        return;
     }
-    
+
     const id = user[0]._ref._path.segments[1]
     const token = jwt.sign({ id: id }, process.env.JWT_SECRET, {
         expiresIn: 300
