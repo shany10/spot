@@ -6,22 +6,23 @@ class UserModel {
         this.email = user.email;
         this.password = user.password;
         this.hashPassword
+        this.create_at
     }
 
     model() {
 
-        if(!this.name) return {'error': 'name'};
-        if(!this.lastname) return {'error': 'lastname'};
-        if(!this.email) return {'error': 'email'};
-        if(!this.password) return {'error': 'password'};
+        if(!this.name) return {'error': 'name absent'};
+        if(!this.lastname) return {'error': 'lastname absent'};
+        if(!this.email) return {'error': 'email absent'};
+        if(!this.password) return {'error': 'password absent'};
 
-        return {
-            name: this.name,
-            lastname: this.lastname,
-            email:this.email,
-            password:this.password,
-            hashPassword:this.hashPassword
-        };
+        return [
+            this.name,
+            this.lastname,
+            this.email,
+            this.password,
+            this.create_at
+        ];
     }
 }
     

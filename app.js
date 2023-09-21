@@ -28,5 +28,5 @@ app.use(
 app.use("/api/", general_route)
 app.use("/api/", user_route)
 
-app.get('/', (req, res) => res.send("Bienvenue sur l'api de PartyParty"))
+app.get('/', (req, res) => res.send("Bienvenue sur l'api de Spot"))
 app.listen(process.env.PORT, () => console.log(`go to port => ${process.env.PORT}`))
